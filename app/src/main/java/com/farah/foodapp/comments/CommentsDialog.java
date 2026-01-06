@@ -1,9 +1,8 @@
 package com.farah.foodapp.comments;
 
-import com.farah.foodapp.sujoud.TextVectorizer;
-import com.farah.foodapp.sujoud.SentimentInterpreter;
+import com.farah.foodapp.algorithm.TextVectorizer;
+import com.farah.foodapp.algorithm.SentimentInterpreter;
 
-import android.app.Activity;
 import android.content.Context;
 import android.os.Bundle;
 import android.view.LayoutInflater;

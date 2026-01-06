@@ -27,7 +27,6 @@
             android:layout_weight="1"
             android:orientation="vertical">
 
-            <!-- السطر العلوي: الاسم يسار، الزر يمين -->
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -66,15 +65,6 @@
                 android:textColor="#555555"
                 android:layout_marginTop="2dp" />
 
-            <TextView
-                android:id="@+id/tvRestaurantName"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="Restaurant name"
-                android:textColor="@color/gray"
-                android:textStyle="italic"
-                android:textSize="13sp"
-                android:layout_marginTop="4dp" />
 
         </LinearLayout>
     </LinearLayout>

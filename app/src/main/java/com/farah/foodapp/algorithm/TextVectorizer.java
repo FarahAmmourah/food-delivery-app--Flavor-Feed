@@ -1,4 +1,4 @@
-package com.farah.foodapp.sujoud;
+package com.farah.foodapp.algorithm;
 
 import java.util.HashMap;
 import java.util.Map;

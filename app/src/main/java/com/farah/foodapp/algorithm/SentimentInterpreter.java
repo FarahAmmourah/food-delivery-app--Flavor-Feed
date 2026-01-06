@@ -1,4 +1,4 @@
-package com.farah.foodapp.sujoud;
+package com.farah.foodapp.algorithm;
 
 import android.content.Context;
 import org.tensorflow.lite.Interpreter;

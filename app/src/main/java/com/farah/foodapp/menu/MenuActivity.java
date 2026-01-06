@@ -109,7 +109,11 @@ public class MenuActivity extends AppCompatActivity {
                     foodList.clear();
                     for (QueryDocumentSnapshot doc : queryDocumentSnapshots) {
                         FoodItem item = doc.toObject(FoodItem.class);
+                        item.setId(doc.getId()); // meal id
+                        item.setRestaurantId(doc.getString("restaurantId"));
+                        item.setRestaurantName(doc.getString("restaurantName"));
                         foodList.add(item);
+
                     }
 
                     adapter.setFoodListFull(foodList);

@@ -195,7 +195,7 @@ public class ReelsAdapter extends RecyclerView.Adapter<ReelsAdapter.ReelViewHold
                             if (smallPrice == null) smallPrice = 0.0;
                             if (largePrice == null) largePrice = smallPrice;
 
-                            String finalName = name;
+                            String finalName = name;// meal name
                             String finalImageUrl = imageUrl;
                             Double finalSmallPrice = smallPrice;
                             Double finalLargePrice = largePrice;

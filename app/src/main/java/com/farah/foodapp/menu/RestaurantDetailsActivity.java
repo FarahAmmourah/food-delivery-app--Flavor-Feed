@@ -133,6 +133,8 @@ public class RestaurantDetailsActivity extends AppCompatActivity {
                         );
 
                         item.setId(doc.getId());
+                        item.setRestaurantId(restaurantId);
+
                         menuList.add(item);
                     }
                     adapter.notifyDataSetChanged();

@@ -37,28 +37,7 @@
             android:textColor="#555555"
             android:layout_marginTop="4dp" />
 
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:layout_marginTop="12dp">
 
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Any special requests?"
-                android:textSize="14sp"
-                android:textColor="#555555" />
-
-            <TextView
-                android:id="@+id/tvAddNote"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Add note"
-                android:textStyle="bold"
-                android:textColor="#FF5722"
-                android:layout_marginStart="8dp"/>
-        </LinearLayout>
     </LinearLayout>
 
     <LinearLayout
