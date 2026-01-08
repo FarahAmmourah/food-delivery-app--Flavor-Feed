@@ -85,20 +85,30 @@ public class CommentsDialog extends BottomSheetDialog {
 
         for (Object c : comments) {
 
-            String pureComment = extractPureComment(c);
+            String pureComment = extractPureComment(c);// remove username
 
             try {
                 float[] input = TextVectorizer.vectorize(pureComment);// comment will change into vectors of nums
 
-                float[] output = SentimentInterpreter.predict(input, getContext());// call ml model , par2 download the tensor flow model found in assets
+                float[] output = SentimentInterpreter.predict(input, getContext());// call ml model , par2 download the tensor flow model found in assets tell me what the sentiment is
 
-                if (output[0] >= output[1] && output[0] >= output[2]) {
+                float neg = output[0];   // Negative
+                float neu = output[1];   // Neutral
+                float pos = output[2];   // Positive
+
+                //exmp:[0.12, 0.18, 0.70] all under one and greater than zero
+
+
+
+                if (pos > 0.6f) {// softmax all equal to one
                     positive++;
-                } else if (output[1] >= output[0] && output[1] >= output[2]) {
+                } else if (neg > 0.6f) {
                     negative++;
                 } else {
                     neutral++;
                 }
+
+
 
             } catch (Exception e) {
                 e.printStackTrace();

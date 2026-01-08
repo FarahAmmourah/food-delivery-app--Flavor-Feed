@@ -5,66 +5,96 @@ import java.util.Map;
 
 public class TextVectorizer {
 
+    private static final int VOCAB_SIZE = 300;
     private static final Map<String, Integer> vocab = new HashMap<>();
 
     static {
-        vocab.put("am", 0);
-        vocab.put("amazing", 1);
-        vocab.put("angry", 2);
-        vocab.put("bad", 3);
-        vocab.put("best", 4);
-        vocab.put("day", 5);
-        vocab.put("disappointed", 6);
-        vocab.put("don", 7);
-        vocab.put("ever", 8);
-        vocab.put("everything", 9);
-        vocab.put("feel", 10);
-        vocab.put("good", 11);
-        vocab.put("happy", 12);
-        vocab.put("hate", 13);
-        vocab.put("is", 14);
-        vocab.put("it", 15);
-        vocab.put("like", 16);
-        vocab.put("love", 17);
-        vocab.put("made", 18);
-        vocab.put("much", 19);
-        vocab.put("my", 20);
-        vocab.put("neutral", 21);
-        vocab.put("not", 22);
-        vocab.put("nothing", 23);
-        vocab.put("okay", 24);
-        vocab.put("perfect", 25);
-        vocab.put("sad", 26);
-        vocab.put("satisfied", 27);
-        vocab.put("so", 28);
-        vocab.put("special", 29);
-        vocab.put("terrible", 30);
-        vocab.put("the", 31);
-        vocab.put("thing", 32);
-        vocab.put("this", 33);
-        vocab.put("very", 34);
-        vocab.put("worst", 35);
+        int idx = 0;
+
+        // ================= POSITIVE (100) =================
+        String[] positiveWords = {
+                "tasty","delicious","yummy","flavorful","mouthwatering","savory","juicy",
+                "crispy","fresh","soft","perfect","excellent","amazing","awesome",
+                "fantastic","wonderful","great","nice","pleasant","love","loved",
+                "enjoy","enjoyed","happy","satisfied","impressed","favorite","best",
+                "good","positive","pleased","excited","fast","quick","friendly","kind",
+                "polite","helpful","clean","hygienic","professional","organized",
+                "smooth","easy","comfortable","worth","reasonable","affordable",
+                "cheap","recommended","recommend","delightful","hot","warm","tender",
+                "rich","creamy","balanced","again","always","definitely","surely",
+                "absolutely","totally","highquality","top","five","stars","freshfood",
+                "goodfood","greatfood","nicemeal","perfectmeal","excellentservice",
+                "greatservice","bestfood","bestservice","wow","amazingfood"
+        };
+
+        // ================= NEGATIVE (100) =================
+        String[] negativeWords = {
+                "bad","terrible","awful","horrible","worst","tasteless","bland","salty",
+                "sweet","burnt","overcooked","undercooked","raw","dry","hard","stale",
+                "soggy","cold","greasy","oily","hate","hated","angry","annoyed","upset",
+                "unhappy","disappointed","frustrated","regret","sad","mad","furious",
+                "slow","late","delay","delayed","rude","impolite","unfriendly",
+                "careless","unprofessional","dirty","messy","confusing","wrong",
+                "missing","incomplete","problem","issue","mistake","error","refund",
+                "complaint","complain","returned","cancelled","overpriced","expensive",
+                "waste","wasted","poor","lowquality","notworth","badservice","badfood",
+                "never","avoid","worstever","terribleexperience","disaster","fail",
+                "failed","failure","coldfood","badexperience","angryservice"
+        };
+
+        // ================= NEUTRAL (100) =================
+        String[] neutralWords = {
+                "okay","normal","average","fine","acceptable","regular","standard",
+                "food","meal","dish","menu","restaurant","service","delivery","order",
+                "taste","flavor","portion","quantity","price","value","staff","waiter",
+                "waitress","table","place","location","branch","kitchen","chef",
+                "ingredients","packaging","hygiene","cleanliness","quality",
+                "experience","drink","dessert","snack","breakfast","lunch","dinner",
+                "burger","pizza","sandwich","chicken","meat","rice","pasta","salad",
+                "sauce","cheese","the","is","it","this","that","very","so","not",
+                "was","were","my","we","they","you","i","and","or","but","with","for",
+                "to","of","in","on","at","from","time","day","today","yesterday",
+                "now","before","after","again","sometimes","usually","often"
+        };
+
+        idx = addWords(positiveWords, idx);
+        idx = addWords(negativeWords, idx);
+        idx = addWords(neutralWords, idx);
     }
 
+
+    // call by static to give each word in vocab an index
+    private static int addWords(String[] words, int startIdx) {
+        for (String w : words) {
+            if (!vocab.containsKey(w) && startIdx < VOCAB_SIZE) {/* check that
+     the word is not taken already no redandant and do no exceed limit 300*/
+                vocab.put(w, startIdx++);// put the word in vocab of given indexand then raise counter by one
+            }
+        }
+        return startIdx;
+    }
+
+    /**
+     * Frequency-based Bag of Words vector (300)
+     */
     public static float[] vectorize(String text) {
-        float[] vector = new float[36];/* these are the number of vectors which
-                                       represent a vocab not num of words in sentence
-                                       The sentiment_model.tflite file is the trained machine learning model
-                                       used for inference on the mobile device.*/
+
+        float[] vector = new float[VOCAB_SIZE];
+
+        if (text == null || text.isEmpty()) {
+            return vector;
+        }
 
         text = text.toLowerCase();
-        String[] words = text.split("\\s+");  /*here split takes reg exp to remove
-                                                    space tabs even if they were a lot */
+        String[] words = text.split("\\s+");// turn the sentence into array of words
 
         for (String word : words) {
-            if (vocab.containsKey(word)) {
-                int index = vocab.get(word);/*هاي بتشوف كل كلمه من اللغه يللي انا عرفتها كم مره تكررت و
-                                                      بتضيف عدد التكرار بالاندكس تبع الكلمه */
-                vector[index] += 1f;
+            Integer index = vocab.get(word);
+            if (index != null) {
+                vector[index] += 1f;// add one to the vector
             }
         }
 
-        return vector;/*The returned vector always has a fixed length equal to the vocabulary size,
-        where each index stores the frequency of its corresponding word.*/
+        return vector;
     }
 }
