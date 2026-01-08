@@ -76,6 +76,7 @@ public class OrderHistoryActivity extends AppCompatActivity {
                     orderList.clear();
                     List<OrderAdmin> tempOrders = new ArrayList<>();
 
+                    // Filter orders by restaurant and status
                     for (QueryDocumentSnapshot doc : query) {
                         String docRestaurant = doc.getString("restaurantName");
                         if (docRestaurant == null || !docRestaurant.equals(restaurantName)) continue;
@@ -93,6 +94,7 @@ public class OrderHistoryActivity extends AppCompatActivity {
                             order.setCustomerAddress(address);
                         }
 
+                        // Add only completed or cancelled orders
                         if (order.getStatus() != null &&
                                 (order.getStatus().equalsIgnoreCase("completed") ||
                                         order.getStatus().equalsIgnoreCase("cancelled"))) {
@@ -102,6 +104,7 @@ public class OrderHistoryActivity extends AppCompatActivity {
 
                     final int[] remaining = {tempOrders.size()};
                     if (remaining[0] == 0) {
+                        // No orders to show
                         tvNoOrders.setVisibility(TextView.VISIBLE);
                         recyclerOrders.setVisibility(RecyclerView.GONE);
                         return;
@@ -114,6 +117,7 @@ public class OrderHistoryActivity extends AppCompatActivity {
                             continue;
                         }
 
+                        // Fetch customer names
                         firestore.collection("users")
                                 .document(userId)
                                 .get()
@@ -125,6 +129,7 @@ public class OrderHistoryActivity extends AppCompatActivity {
                                 .addOnCompleteListener(task -> {
                                     remaining[0]--;
                                     if (remaining[0] == 0) {
+                                        // When all user names are fetched
                                         orderList.clear();
                                         orderList.addAll(tempOrders);
 
@@ -133,6 +138,7 @@ public class OrderHistoryActivity extends AppCompatActivity {
                                             return o2.getCreatedAt().compareTo(o1.getCreatedAt());
                                         });
 
+                                        // Show orders or no orders message
                                         if (orderList.isEmpty()) {
                                             tvNoOrders.setVisibility(TextView.VISIBLE);
                                             recyclerOrders.setVisibility(RecyclerView.GONE);

@@ -11,6 +11,7 @@ import androidx.annotation.NonNull;
 import androidx.core.app.NotificationCompat;
 
 import com.farah.foodapp.R;
+import com.farah.foodapp.orders.OrdersActivity;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.messaging.FirebaseMessagingService;
@@ -20,6 +21,7 @@ import java.util.Objects;
 
 public class MyFirebaseMessagingService extends FirebaseMessagingService {
 
+    // Channel ID for notifications (used for Android 8.0+)
     private static final String CHANNEL_ID = "default_channel";
 
     @Override
@@ -29,27 +31,31 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
         String title = null;
         String body = null;
 
+        //get title and body from notification payload
         if (remoteMessage.getNotification() != null) {
             title = remoteMessage.getNotification().getTitle();
             body = remoteMessage.getNotification().getBody();
         }
 
-        if (remoteMessage.getData().size() > 0) {
+        // if payload exist but no title or body
+        if (!remoteMessage.getData().isEmpty()) {
             if (title == null) title = remoteMessage.getData().get("title");
             if (body == null) body = remoteMessage.getData().get("message");
-            android.util.Log.d("FCMService", "Data payload: " + remoteMessage.getData());
         }
 
+        // Default values if title or body are missing
         if (title == null) title = "Notification";
         if (body == null) body = "No message body";
 
         showNotification(title, body);
     }
 
+    // Called when FCM generates a new token (device registration token)
     @Override
     public void onNewToken(@NonNull String token) {
         super.onNewToken(token);
 
+        // If user is logged in, save the token in Firestore
         if (FirebaseAuth.getInstance().getCurrentUser() != null) {
             String userId = Objects.requireNonNull(FirebaseAuth.getInstance().getCurrentUser()).getUid();
             FirebaseFirestore.getInstance()
@@ -63,6 +69,7 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
         NotificationManager notificationManager =
                 (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
 
+        // For Android 8.0+ we need to create a notification channel
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             NotificationChannel channel = new NotificationChannel(
                     CHANNEL_ID,
@@ -72,7 +79,14 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
             notificationManager.createNotificationChannel(channel);
         }
 
-        Intent intent = new Intent(this, com.farah.foodapp.orders.OrdersActivity.class);
+        Intent intent = new Intent(this, OrdersActivity.class);
+
+        // (FLAG_ACTIVITY_CLEAR_TOP) ->
+        // If the activity already exists in the back stack,
+        // all activities above it are removed.
+
+        //FLAG_ACTIVITY_SINGLE_TOP
+        //If the activity is already on top, don’t create a new instance.
         intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
 
         PendingIntent pendingIntent = PendingIntent.getActivity(
@@ -90,6 +104,7 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
                 .setAutoCancel(true)
                 .setContentIntent(pendingIntent);
 
+        // Show the notification (using current time as unique ID)
         notificationManager.notify((int) System.currentTimeMillis(), builder.build());
     }
 }

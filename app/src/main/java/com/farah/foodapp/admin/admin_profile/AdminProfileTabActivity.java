@@ -38,6 +38,7 @@ public class AdminProfileTabActivity extends Fragment {
                              @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.profile_tab_admin, container, false);
 
+        //initialize views
         tvTotalOrders = view.findViewById(R.id.tv_total_orders);
         layoutOrderHistory = view.findViewById(R.id.layout_order_history);
         layoutSpecials = view.findViewById(R.id.layout_specials);

@@ -56,6 +56,7 @@ public class SpecialsActivity extends AppCompatActivity {
     private void loadSpecials() {
         String restaurantId = FirebaseAuth.getInstance().getCurrentUser().getUid();
 
+        // load items with rating greater than 6
         db.collection("restaurants")
                 .document(restaurantId)
                 .collection("menu")

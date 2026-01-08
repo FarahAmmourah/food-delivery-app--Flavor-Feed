@@ -36,6 +36,7 @@ public class CartActivity extends AppCompatActivity implements CartAdapter.OnCar
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_cart);
 
+        //initialize views
         layoutEmptyCart = findViewById(R.id.layoutEmptyCart);
         tvSubtotal = findViewById(R.id.tvSubtotal);
         tvDelivery = findViewById(R.id.tvDelivery);
@@ -116,6 +117,7 @@ public class CartActivity extends AppCompatActivity implements CartAdapter.OnCar
         tvTotalPrice.setText("Total: " + total + " JD");
 
         if (CartManager.getCartItems().isEmpty()) {
+            // if no items show empty cart view
             layoutEmptyCart.setVisibility(LinearLayout.VISIBLE);
             recyclerCart.setVisibility(RecyclerView.GONE);
         } else {

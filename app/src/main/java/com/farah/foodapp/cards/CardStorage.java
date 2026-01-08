@@ -20,6 +20,7 @@ public class CardStorage {
         void onComplete(boolean success);
     }
 
+    // save user cards in firebase
     public static void saveCard(Context context, String last4, String expiry, String holderName, CardSaveCallback callback) {
         if (context == null) {
             if (callback != null) callback.onComplete(false);

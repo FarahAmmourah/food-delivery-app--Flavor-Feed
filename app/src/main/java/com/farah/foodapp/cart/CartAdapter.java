@@ -19,6 +19,7 @@ import java.util.List;
 
 public class CartAdapter extends RecyclerView.Adapter<CartAdapter.CartViewHolder> {
 
+    // Listener interface to notify when cart changes (item added/removed)
     public interface OnCartChangedListener {
         void onCartUpdated();
     }
@@ -49,6 +50,7 @@ public class CartAdapter extends RecyclerView.Adapter<CartAdapter.CartViewHolder
         holder.tvCartQuantity.setText(String.valueOf(item.getQuantity()));
         holder.tvCartPrice.setText("JOD " + String.format("%.2f", item.getPrice() * item.getQuantity()));
 
+        // Load food image using Glide (with placeholder/error image)
         Glide.with(context)
                 .load(item.getImageUrl())
                 .placeholder(R.drawable.ic_food_placeholder)
@@ -56,15 +58,15 @@ public class CartAdapter extends RecyclerView.Adapter<CartAdapter.CartViewHolder
                 .into(holder.imgCartFood);
 
         holder.btnDecrease.setOnClickListener(v -> {
-            CartManager.decreaseItem(item);
-            notifyDataSetChanged();
-            if (listener != null) listener.onCartUpdated();
+            CartManager.decreaseItem(item);// Decrease quantity
+            notifyDataSetChanged();// Refresh the RecyclerView
+            if (listener != null) listener.onCartUpdated();// Notify listener
         });
 
         holder.btnIncrease.setOnClickListener(v -> {
-            CartManager.increaseItem(item);
-            notifyDataSetChanged();
-            if (listener != null) listener.onCartUpdated();
+            CartManager.increaseItem(item);// increase quantity
+            notifyDataSetChanged();// Refresh the recycle view
+            if (listener != null) listener.onCartUpdated();// Notify listener
         });
     }
 
@@ -73,6 +75,7 @@ public class CartAdapter extends RecyclerView.Adapter<CartAdapter.CartViewHolder
         return cartItems.size();
     }
 
+    // ViewHolder class to hold item views
     public static class CartViewHolder extends RecyclerView.ViewHolder {
         ImageView imgCartFood;
         TextView tvCartName, tvCartRestaurant, tvCartQuantity, tvCartPrice;
@@ -81,6 +84,7 @@ public class CartAdapter extends RecyclerView.Adapter<CartAdapter.CartViewHolder
 
         public CartViewHolder(@NonNull View itemView) {
             super(itemView);
+            // Find views by ID
             imgCartFood = itemView.findViewById(R.id.imgCartFood);
             tvCartName = itemView.findViewById(R.id.tvCartName);
             tvCartRestaurant = itemView.findViewById(R.id.tvCartRestaurant);
@@ -88,7 +92,7 @@ public class CartAdapter extends RecyclerView.Adapter<CartAdapter.CartViewHolder
             tvCartPrice = itemView.findViewById(R.id.tvCartPrice);
             btnDecrease = itemView.findViewById(R.id.btnDecrease);
             btnIncrease = itemView.findViewById(R.id.btnIncrease);
-            cardView = (CardView) itemView;
+            cardView = (CardView) itemView;// Cast parent layout: View -> CardView
         }
     }
 }

@@ -28,6 +28,8 @@ public class AvailableRewardsActivity extends Fragment {
 
     private FirebaseFirestore db;
     private String currentUserId;
+
+    //UI elements
     private ProgressBar progressRewards;
     private TextView tvRewardCounter;
     private LinearLayout topRestaurantsContainer;
@@ -40,20 +42,24 @@ public class AvailableRewardsActivity extends Fragment {
 
         View view = inflater.inflate(R.layout.activity_available_rewards, container, false);
 
+        //initialize firebase
         db = FirebaseFirestore.getInstance();
+        //get current user id
         currentUserId = FirebaseAuth.getInstance().getCurrentUser().getUid();
 
+        //find UI elements by id
         progressRewards = view.findViewById(R.id.progress_rewards);
         tvRewardCounter = view.findViewById(R.id.tv_reward_counter);
         topRestaurantsContainer = view.findViewById(R.id.topRestaurantsContainer);
 
+        //emojis
         TextView e1 = view.findViewById(R.id.emoji1);
         TextView e2 = view.findViewById(R.id.emoji2);
         TextView e3 = view.findViewById(R.id.emoji3);
         TextView e4 = view.findViewById(R.id.emoji4);
 
+        // start animation
         Animation dance = AnimationUtils.loadAnimation(getContext(), R.anim.dance);
-
         e1.startAnimation(dance);
 
         Animation dance2 = AnimationUtils.loadAnimation(getContext(), R.anim.dance);
@@ -68,17 +74,22 @@ public class AvailableRewardsActivity extends Fragment {
         dance4.setStartOffset(450);
         e4.startAnimation(dance4);
 
+        // Load user orders and render loyalty & rewards
         loadOrdersData();
+
+        // Set click listeners for reward icons
         setupRewardClickListeners(view);
 
         return view;
     }
 
+    //Load all orders for the current user and calculate stats
     private void loadOrdersData() {
         db.collection("orders")
                 .whereEqualTo("userId", currentUserId)
                 .get()
                 .addOnSuccessListener(querySnapshot -> {
+                    // Map to hold order counts per restaurant
                     HashMap<String, RestaurantStats> restaurantMap = new HashMap<>();
 
                     for (QueryDocumentSnapshot doc : querySnapshot) {
@@ -95,10 +106,14 @@ public class AvailableRewardsActivity extends Fragment {
                         restaurantMap.put(restaurantName, stats);
                     }
 
+                    // Sort restaurants by most orders
                     List<RestaurantStats> list = new ArrayList<>(restaurantMap.values());
                     list.sort((a, b) -> Integer.compare(b.count, a.count));
 
+                    // Render top restaurants in UI
                     renderTopRestaurants(list);
+
+                    // Update loyalty progress and locked reward UI
                     updateProgress(querySnapshot.size(), restaurantMap.size());
                     updateLockedRewardSection(querySnapshot.size(), restaurantMap.size());
                 })
@@ -106,11 +121,14 @@ public class AvailableRewardsActivity extends Fragment {
                         Toast.makeText(getContext(), "Failed to load data", Toast.LENGTH_SHORT).show()
                 );
     }
+
+    //Render top restaurants with stars, logos, and order counts
     private void renderTopRestaurants(List<RestaurantStats> list) {
         if (topRestaurantsContainer == null || getContext() == null) return;
         topRestaurantsContainer.removeAllViews();
 
         for (RestaurantStats r : list) {
+            // Inflate single restaurant item layout
             View item = LayoutInflater.from(getContext())
                     .inflate(R.layout.item_restaurant_progress, topRestaurantsContainer, false);
 
@@ -124,10 +142,12 @@ public class AvailableRewardsActivity extends Fragment {
             name.setText(r.name);
             count.setText("You ordered " + r.count + " times");
 
-            int goal = 5;
+            // Star & reward logic
+            int goal = 5;// orders needed for a reward
             int starsFilled = r.count % goal;
             int remainingToNext = goal - starsFilled;
 
+            // Add empty stars to UI
             starContainer.removeAllViews();
             List<ImageView> stars = new ArrayList<>();
             for (int i = 0; i < goal; i++) {
@@ -142,6 +162,7 @@ public class AvailableRewardsActivity extends Fragment {
                 stars.add(star);
             }
 
+            // Animate filled stars
             starContainer.postDelayed(() -> {
                 for (int i = 0; i < starsFilled; i++) {
                     final ImageView s = stars.get(i);
@@ -155,6 +176,7 @@ public class AvailableRewardsActivity extends Fragment {
                 }
             }, 200);
 
+            // Remaining orders message
             if (starsFilled == 0) {
                 remaining.setText("Make your first order to start earning rewards!");
             } else if (remainingToNext == 0) {
@@ -163,18 +185,21 @@ public class AvailableRewardsActivity extends Fragment {
                 remaining.setText(remainingToNext + " orders left to next reward");
             }
 
+            // Load restaurant logo
             if (r.logoUrl != null && !r.logoUrl.isEmpty()) {
                 Glide.with(this).load(r.logoUrl).into(logo);
             } else {
                 logo.setImageResource(R.drawable.ic_restaurant);
             }
 
+            // Handle order button click to open restaurant details
             btnOrder.setOnClickListener(v -> {
                 if (r.id != null && !r.id.isEmpty()) {
                     Intent intent = new Intent(getContext(), RestaurantDetailsActivity.class);
                     intent.putExtra("restaurantId", r.id);
                     startActivity(intent);
                 } else {
+                    //find restaurant ID from Firestore
                     FirebaseFirestore db = FirebaseFirestore.getInstance();
                     db.collection("restaurants")
                             .whereEqualTo("name", r.name)
@@ -203,10 +228,13 @@ public class AvailableRewardsActivity extends Fragment {
             topRestaurantsContainer.addView(item);
         }
     }
+
+    //Update global loyalty progress and level stars
     private void updateProgress(int totalOrders, int uniqueRestaurants) {
         TextView tvLevel = getView().findViewById(R.id.tv_loyalty_level);
         LinearLayout globalStarContainer = getView().findViewById(R.id.globalStarContainer);
 
+        // Calculate loyalty level based on total orders
         int levelIndex = 0;
         levelIndex = totalOrders / 10;
 
@@ -215,11 +243,13 @@ public class AvailableRewardsActivity extends Fragment {
         levelIndex = Math.min(levelIndex, levelNames.length - 1);
         String currentLevel = levelNames[levelIndex];
 
+        // Progress percentage toward next level
         int currentThreshold = levelIndex * 10;
         int nextThreshold = (levelIndex + 1) * 10;
         int progressPercent = (int) (((float) (totalOrders - currentThreshold) / (nextThreshold - currentThreshold)) * 100);
         if (progressPercent > 100) progressPercent = 100;
 
+        //update UI
         tvRewardCounter.setText("You made " + totalOrders + " orders across " + uniqueRestaurants + " restaurants");
         tvLevel.setText("Level: " + currentLevel);
 
@@ -232,6 +262,7 @@ public class AvailableRewardsActivity extends Fragment {
             default: tvLevel.setTextColor(getResources().getColor(R.color.primary)); break;
         }
 
+        // Animate global stars
         int totalStars = 5;
         globalStarContainer.removeAllViews();
         List<ImageView> stars = new ArrayList<>();
@@ -251,6 +282,7 @@ public class AvailableRewardsActivity extends Fragment {
         int filledStars = (int) Math.ceil((progressPercent / 100.0) * totalStars);
         if (filledStars > totalStars) filledStars = totalStars;
 
+        // Animate filled stars
         int finalFilledStars = filledStars;
         globalStarContainer.postDelayed(() -> {
             for (int i = 0; i < finalFilledStars; i++) {
@@ -271,10 +303,14 @@ public class AvailableRewardsActivity extends Fragment {
 
         progressRewards.setProgress(progressPercent);
 
+        // Show legendary badge if level is Legend
         if (currentLevel.equals("Legend")) {
             showLegendBadge();
         }
     }
+
+
+    //Update the locked/unlocked reward section UI
     private void updateLockedRewardSection(int totalOrders, int uniqueRestaurants) {
         View root = getView();
         if (root == null) return;
@@ -284,6 +320,7 @@ public class AvailableRewardsActivity extends Fragment {
         ImageView imgGift = root.findViewById(R.id.imgRewardGift);
         ImageView imgLock = root.findViewById(R.id.imgLockOverlay);
 
+        // Next reward goal is the next multiple of 5
         int nextGoal = ((totalOrders / 5) + 1) * 5;
         int remaining = nextGoal - totalOrders;
         if (remaining < 0) remaining = 0;
@@ -295,11 +332,12 @@ public class AvailableRewardsActivity extends Fragment {
             imgLock.setVisibility(View.GONE);
 
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
-                imgGift.setRenderEffect(null);
+                imgGift.setRenderEffect(null); // remove blur
             } else {
                 imgGift.animate().alpha(1f).setDuration(400).start();
             }
 
+            // Add small scaling animation to gift
             imgGift.animate()
                     .scaleX(1.2f).scaleY(1.2f)
                     .setDuration(300)
@@ -319,6 +357,8 @@ public class AvailableRewardsActivity extends Fragment {
             }
         }
     }
+
+    //Setup click listeners for reward icons
     private void setupRewardClickListeners(View root) {
         int[] rewardIds = {R.id.ic_delivery, R.id.ic_discount, R.id.ic_meal};
         String[] rewardNames = {"Free Delivery", "Discount 20%", "Free Meal"};
@@ -334,6 +374,8 @@ public class AvailableRewardsActivity extends Fragment {
         }
     }
 
+
+    //Show dialog to select restaurant to redeem reward
     private void showRewardDialog(String rewardName) {
         if (getContext() == null) return;
 
@@ -376,6 +418,7 @@ public class AvailableRewardsActivity extends Fragment {
                 );
     }
 
+    //Redeem reward and save to Firestore
     private void redeemReward(String rewardName, String restaurantName) {
         if (currentUserId == null) return;
 
@@ -395,6 +438,8 @@ public class AvailableRewardsActivity extends Fragment {
                         Toast.makeText(getContext(), "Failed to redeem reward", Toast.LENGTH_SHORT).show()
                 );
     }
+
+    //Show dialog when user reaches Legend level
     private void showLegendBadge() {
         if (getContext() == null) return;
 
@@ -404,6 +449,8 @@ public class AvailableRewardsActivity extends Fragment {
                 .setPositiveButton("Awesome!", null)
                 .show();
     }
+
+    //Class to hold restaurant stats for rendering
     private static class RestaurantStats {
         String name;
         String logoUrl;

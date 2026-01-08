@@ -7,6 +7,7 @@ public class RestaurantDataManager {
     private FirebaseFirestore db;
     private StringBuilder restaurantContext;
 
+    // Callback interface to notify when data is loaded or an error occurs
     public interface DataLoadCallback {
         void onDataLoaded(String context);
         void onError(String error);
@@ -28,6 +29,7 @@ public class RestaurantDataManager {
                         return;
                     }
 
+                    // Track how many restaurants are left to process (because menu loading is async)
                     final int[] remaining = {queryDocs.size()};
 
                     for (QueryDocumentSnapshot restaurantDoc : queryDocs) {
@@ -84,6 +86,8 @@ public class RestaurantDataManager {
 
                                     restaurantContext.append("\n");
                                     remaining[0]--;
+
+                                    // If all restaurants are processed, call the callback
                                     if (remaining[0] == 0) {
                                         callback.onDataLoaded(restaurantContext.toString());
                                     }
@@ -97,6 +101,6 @@ public class RestaurantDataManager {
                                 });
                     }
                 })
-                .addOnFailureListener(e -> callback.onError(e.getMessage()));
+                .addOnFailureListener(e -> callback.onError(e.getMessage())); // error loading restaurants
     }
 }

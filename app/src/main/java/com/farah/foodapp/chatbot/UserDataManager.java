@@ -20,7 +20,7 @@ public class UserDataManager {
     }
 
     public void loadUserDataWithOrders(String userId, DataLoadCallback callback) {
-        // Step 1: Load user info
+        //Load user info
         db.collection("users").document(userId).get()
                 .addOnSuccessListener(userDoc -> {
                     if (!userDoc.exists()) {
@@ -35,7 +35,7 @@ public class UserDataManager {
                     context.append("Phone: ").append(userDoc.getString("phone")).append("\n");
                     context.append("Location: ").append(userDoc.getString("location")).append("\n\n");
 
-                    // Step 2: Load user's recent orders
+                    //Load user's recent orders
                     db.collection("orders").whereEqualTo("userId", userId).get()
                             .addOnSuccessListener(orderDocs -> {
                                 if (orderDocs.isEmpty()) {
@@ -71,6 +71,6 @@ public class UserDataManager {
                             })
                             .addOnFailureListener(e -> callback.onError(e.getMessage()));
                 })
-                .addOnFailureListener(e -> callback.onError(e.getMessage()));
+                .addOnFailureListener(e -> callback.onError(e.getMessage())); // error loading info
     }
 }

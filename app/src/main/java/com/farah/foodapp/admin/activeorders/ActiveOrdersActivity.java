@@ -54,6 +54,7 @@ public class ActiveOrdersActivity extends Fragment {
         firestore = FirebaseFirestore.getInstance();
         String restaurantId = FirebaseAuth.getInstance().getCurrentUser().getUid();
 
+        // fetch restaurant's name based on its id
         firestore.collection("restaurants")
                 .document(restaurantId)
                 .get()

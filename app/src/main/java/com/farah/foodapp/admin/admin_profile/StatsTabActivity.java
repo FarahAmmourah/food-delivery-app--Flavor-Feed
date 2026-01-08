@@ -33,6 +33,7 @@ import java.util.*;
 
 public class StatsTabActivity extends Fragment {
 
+    //UI elements
     private TextView tvRevenue, tvCustomers, tvRating, tvPrediction;
     private BarChart barChart;
     private PieChart pieChart;
@@ -45,6 +46,7 @@ public class StatsTabActivity extends Fragment {
 
         View view = inflater.inflate(R.layout.stats_tab_admin, container, false);
 
+        // Initialize TextViews and set their labels
         tvRevenue = view.findViewById(R.id.card_total_revenue).findViewById(R.id.tv_value);
         ((TextView) view.findViewById(R.id.card_total_revenue).findViewById(R.id.tv_label))
                 .setText("Total Revenue");
@@ -57,6 +59,7 @@ public class StatsTabActivity extends Fragment {
         ((TextView) view.findViewById(R.id.card_avg_rating).findViewById(R.id.tv_label))
                 .setText("Avg Rating");
 
+        // Initialize charts
         barChart = view.findViewById(R.id.barChartOrders);
         pieChart = view.findViewById(R.id.pieChartCategories);
         tvPrediction = view.findViewById(R.id.tv_prediction);
@@ -65,6 +68,8 @@ public class StatsTabActivity extends Fragment {
         return view;
     }
 
+
+    //Fetch current restaurant's data and trigger charts loading.
     private void loadStats() {
         String uid = Objects.requireNonNull(FirebaseAuth.getInstance().getCurrentUser()).getUid();
         FirebaseFirestore db = FirebaseFirestore.getInstance();
@@ -91,6 +96,7 @@ public class StatsTabActivity extends Fragment {
                     Map<Integer, Float> monthlyRevenue = new HashMap<>();
                     Map<String, Integer> statusCount = new HashMap<>();
 
+                    // Iterate orders and calculate metrics
                     for (QueryDocumentSnapshot doc : query) {
                         String docRestaurant = doc.getString("restaurantName");
                         if (docRestaurant == null || !docRestaurant.equalsIgnoreCase(restaurantName)) continue;
@@ -107,6 +113,7 @@ public class StatsTabActivity extends Fragment {
                             ratedOrders++;
                         }
 
+                        // Extract month from order date
                         Object createdAtObj = doc.get("createdAt");
                         Date date = null;
                         if (createdAtObj instanceof com.google.firebase.Timestamp) {
@@ -129,12 +136,14 @@ public class StatsTabActivity extends Fragment {
                         statusCount.put(status, statusCount.getOrDefault(status, 0) + 1);
                     }
 
+                    // Update TextViews
                     tvRevenue.setText(String.format("%.2f JOD", totalRevenue));
                     tvCustomers.setText(String.valueOf(customers.size()));
                     tvRating.setText(ratedOrders > 0
                             ? String.format("%.1f ★", totalRating / ratedOrders)
                             : "N/A");
 
+                    // Setup charts
                     setupBarChart(monthlyRevenue);
                     setupPieChart(statusCount);
 
@@ -143,10 +152,12 @@ public class StatsTabActivity extends Fragment {
                         Toast.makeText(getContext(), e.getMessage(), Toast.LENGTH_SHORT).show());
     }
 
+    //Predict next month's revenue using simple linear trend => y = slope * month + intercept
     private float predictNextMonthWithTrend(Map<Integer, Float> monthlyRevenue) {
         List<Integer> months = new ArrayList<>();
         List<Float> revenues = new ArrayList<>();
 
+        // Collect data
         for (int i = 0; i < 12; i++) {
             if (monthlyRevenue.containsKey(i)) {
                 months.add(i);
@@ -161,7 +172,9 @@ public class StatsTabActivity extends Fragment {
             meanX += months.get(i);
             meanY += revenues.get(i);
         }
+        // Mean of months
         meanX /= months.size();
+        // Mean of revenues
         meanY /= months.size();
 
         float numerator = 0, denominator = 0;
@@ -177,6 +190,7 @@ public class StatsTabActivity extends Fragment {
         return intercept + slope * nextMonth;
     }
 
+    //Setup monthly revenue bar chart including predicted next month
     private void setupBarChart(Map<Integer, Float> monthlyRevenue) {
         List<BarEntry> entries = new ArrayList<>();
         for (int i = 0; i < 12; i++) {
@@ -198,6 +212,7 @@ public class StatsTabActivity extends Fragment {
             arrow = predictedValue > lastMonthRevenue ? "↑" : "↓";
         }
 
+        //Display prediction
         if (tvPrediction != null) {
             if (predictedValue > 0) {
                 String trendText = String.format(Locale.getDefault(),
@@ -222,6 +237,7 @@ public class StatsTabActivity extends Fragment {
             entries.add(new BarEntry(12, predictedValue));
         }
 
+        // Configure bar chart dataset
         BarDataSet dataSet = new BarDataSet(entries, "Monthly Revenue (JOD)");
         dataSet.setColors(ContextCompat.getColor(requireContext(), R.color.orange_app));
         dataSet.setValueTextColor(Color.BLACK);
@@ -235,6 +251,7 @@ public class StatsTabActivity extends Fragment {
         data.setBarWidth(0.8f);
         barChart.setData(data);
 
+        // Configure Y axis
         YAxis yAxis = barChart.getAxisLeft();
         yAxis.setValueFormatter(new ValueFormatter() {
             @Override
@@ -247,6 +264,7 @@ public class StatsTabActivity extends Fragment {
         yAxis.setGranularity(10f);
         barChart.getAxisRight().setEnabled(false);
 
+        // Configure X axis
         String[] months = new DateFormatSymbols().getShortMonths();
         barChart.getXAxis().setValueFormatter(new ValueFormatter() {
             @Override
@@ -263,6 +281,7 @@ public class StatsTabActivity extends Fragment {
         barChart.invalidate();
     }
 
+    //Setup pie chart to show order status distribution
     private void setupPieChart(Map<String, Integer> statusCount) {
         if (statusCount.isEmpty()) {
             pieChart.clear();

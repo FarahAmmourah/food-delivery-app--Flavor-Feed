@@ -21,52 +21,57 @@ import com.google.firebase.auth.FirebaseAuth;
 import java.util.List;
 
 public class AIChatbotActivity extends AppCompatActivity {
-
+    // Request code for automatic order
+    // (can be any uncommon code)
     private static final int REQUEST_AUTO_ORDER = 1001;
+
 
     private RecyclerView recyclerViewChat;
     private EditText editTextMessage;
     private ChatAdapter chatAdapter;
     private List<Message> messages;
 
-    private GeminiService geminiService;
-    private RestaurantDataManager dataManager;
+    private GeminiService geminiService;// Service to communicate with AI
+    private RestaurantDataManager dataManager;// Load restaurant info
 
-    private String restaurantContextFinal = "";
-    private String userContextFinal = "";
+    private String restaurantContextFinal = "";// Full restaurant info
+    private String userContextFinal = "";// Full user info (preferences/orders)
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_chatbot);
 
+        //Initialize Views
         recyclerViewChat = findViewById(R.id.recyclerViewChat);
         editTextMessage = findViewById(R.id.editTextMessage);
         ImageButton buttonSend = findViewById(R.id.buttonSend);
         ImageButton buttonBack = findViewById(R.id.buttonBack);
         ImageButton buttonClear = findViewById(R.id.buttonClear);
 
+        // Load previous chat history
         messages = ChatStorage.loadMessages(this);
 
         chatAdapter = new ChatAdapter(messages);
 
         recyclerViewChat.setLayoutManager(new LinearLayoutManager(this));
         recyclerViewChat.setAdapter(chatAdapter);
-        recyclerViewChat.scrollToPosition(messages.size() - 1);
+        recyclerViewChat.scrollToPosition(messages.size() - 1); // scroll to last message
 
+        // Button click listeners
         buttonSend.setOnClickListener(v -> sendMessage());
         buttonBack.setOnClickListener(v -> finish());
         buttonClear.setOnClickListener(v -> clearChat());
 
-        geminiService = new GeminiService();
-        dataManager = new RestaurantDataManager();
+        geminiService = new GeminiService(); //Initialize AI Service
+        dataManager = new RestaurantDataManager(); // initialize restaurant data loader
 
-
+        // Load full conversation context (restaurant + user info)
         loadFullContext();
     }
 
     private void loadFullContext() {
-        startTypingAnimation();
+        startTypingAnimation();// show typing dots
 
         dataManager.loadRestaurantData(new RestaurantDataManager.DataLoadCallback() {
             @Override
@@ -114,14 +119,15 @@ public class AIChatbotActivity extends AppCompatActivity {
 
         startTypingAnimation();
 
-        String fullPrompt = buildConversationPrompt(userMsg);
+        String fullPrompt = buildConversationPrompt(userMsg); // build full context prompt
 
+        // Send message to AI service
         geminiService.sendMessage(userMsg, fullPrompt, new GeminiService.ChatCallback() {
             @Override
             public void onSuccess(String response) {
                 runOnUiThread(() -> {
                     stopTypingAnimation();
-                    addBotMessage(response);
+                    addBotMessage(response);// show AI response
                     checkForOrderCommand(response);
                 });
             }
@@ -136,6 +142,7 @@ public class AIChatbotActivity extends AppCompatActivity {
         });
     }
 
+    //Build prompt for AI
     private String buildConversationPrompt(String latestUserMessage) {
         StringBuilder prompt = new StringBuilder();
         prompt.append(restaurantContextFinal).append("\n");
@@ -154,7 +161,7 @@ public class AIChatbotActivity extends AppCompatActivity {
         chatAdapter.notifyItemInserted(messages.size() - 1);
         recyclerViewChat.scrollToPosition(messages.size() - 1);
 
-        ChatStorage.saveMessages(this, messages);
+        ChatStorage.saveMessages(this, messages); // save chat locally
     }
 
     private void addBotMessage(String text) {
@@ -165,6 +172,7 @@ public class AIChatbotActivity extends AppCompatActivity {
         ChatStorage.saveMessages(this, messages);
     }
 
+    // Check if AI response contains "place order" commands
     private void checkForOrderCommand(String aiResponse) {
         String msg = aiResponse.toLowerCase();
 
@@ -183,6 +191,7 @@ public class AIChatbotActivity extends AppCompatActivity {
         }
     }
 
+    // Open CheckoutActivity to place order automatically
     private void placeOrderWithChat() {
         if (CartManager.getCartItems().isEmpty()) {
             addBotMessage("Your Cart is Empty!");

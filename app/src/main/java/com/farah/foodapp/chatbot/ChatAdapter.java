@@ -16,6 +16,7 @@ public class ChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 
     private List<Message> messages;
 
+    // Different view types for user, bot, and typing indicator
     private static final int VIEW_TYPE_USER = 1;
     private static final int VIEW_TYPE_BOT = 2;
     private static final int VIEW_TYPE_TYPING = 3;
@@ -24,6 +25,7 @@ public class ChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
         this.messages = messages;
     }
 
+    //decide which layout to use
     @Override
     public int getItemViewType(int position) {
         Message msg = messages.get(position);

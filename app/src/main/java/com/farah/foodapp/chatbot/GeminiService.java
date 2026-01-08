@@ -11,26 +11,44 @@ import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
 
 public class GeminiService {
+    // API key for Google Gemini AI
     private static final String API_KEY = "AIzaSyAWcsNPA9Qp24-8B5mN8PCsr5HD_cNSuts";
+
+    // This variable represents the Gemini AI model and works asynchronously (Async)
+    // This means when we send a message to the AI, the app doesn’t freeze
+    // and we can get the response whenever it’s ready
     private final GenerativeModelFutures model;
+
+    // This Executor handles running the AI responses on a background thread
+    // so the main UI thread stays smooth and responsive
     private final Executor executor;
 
+
+    // Callback interface to return the AI response or error
     public interface ChatCallback {
         void onSuccess(String response);
         void onError(String error);
     }
 
     public GeminiService() {
+        // Create a GenerativeModel instance for "gemini-2.5-flash"
         GenerativeModel gm = new GenerativeModel("gemini-2.5-flash", API_KEY);
+
+        // Wrap the model
         model = GenerativeModelFutures.from(gm);
+
+        // Create a single-thread executor for async callback handling
+        //this executor runs the response callbacks in the background safely.
         executor = Executors.newSingleThreadExecutor();
     }
 
     public void sendMessage(String userMessage, String context, ChatCallback callback) {
+        // Build the full prompt for the AI
         String fullPrompt = "You are a helpful restaurant assistant.\n\n" +
                 context + "\n\nUser: " + userMessage +
                 "\nProvide a helpful, friendly, concise answer.";
 
+        // Wrap the prompt into a Content object
         Content content = new Content.Builder()
                 .addText(fullPrompt)
                 .build();
