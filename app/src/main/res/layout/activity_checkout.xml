@@ -36,6 +36,7 @@
             android:orientation="vertical"
             android:padding="12dp">
 
+            <!-- Address & Map section -->
             <androidx.cardview.widget.CardView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -88,6 +89,7 @@
                 </LinearLayout>
             </androidx.cardview.widget.CardView>
 
+            <!-- Payment methods -->
             <androidx.cardview.widget.CardView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -120,6 +122,7 @@
                 </LinearLayout>
             </androidx.cardview.widget.CardView>
 
+            <!-- Payment summary -->
             <androidx.cardview.widget.CardView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"

@@ -34,6 +34,7 @@ public class CheckoutActivity extends AppCompatActivity {
     private ActivityResultLauncher<Intent> addCardLauncher;
     private ActivityResultLauncher<Intent> pickLocationLauncher;
 
+    // State variables
     private boolean newCardSaved = false;
     private double selectedLat = 0;
     private double selectedLon = 0;
@@ -52,6 +53,7 @@ public class CheckoutActivity extends AppCompatActivity {
         rgPaymentMethod = findViewById(R.id.rgPaymentMethod);
         btnAddCard = findViewById(R.id.btnAddCard);
 
+        // Calculate and display order summary
         updateSummary();
 
         boolean auto = getIntent().getBooleanExtra("autoPlaceOrder", false);
@@ -72,6 +74,7 @@ public class CheckoutActivity extends AppCompatActivity {
                 result -> loadCards()
         );
 
+        // Add new payment card
         btnAddCard.setOnClickListener(v -> {
             AddCardDialog dialog = new AddCardDialog((last4, expiry, holderName) ->
                     CardStorage.saveCard(this, last4, expiry, holderName, success -> {
@@ -89,6 +92,7 @@ public class CheckoutActivity extends AppCompatActivity {
             dialog.show(getSupportFragmentManager(), "AddCardDialog");
         });
 
+        // Pick delivery location from map
         pickLocationLauncher = registerForActivityResult(
                 new ActivityResultContracts.StartActivityForResult(),
                 result -> {
@@ -122,6 +126,7 @@ public class CheckoutActivity extends AppCompatActivity {
         tvTotal.setText("Total: JOD " + String.format("%.2f", total));
     }
 
+    // Loads saved cards dynamically
     @SuppressLint("SetTextI18n")
     private void loadCards() {
         rgPaymentMethod.removeAllViews();
@@ -197,6 +202,7 @@ public class CheckoutActivity extends AppCompatActivity {
         }
     }
 
+    // Saves order to Firestore
     private void placeOrderWithStatus(String paymentMethodId, String paymentStatus) {
         if (CartManager.getCartItems().isEmpty()) {
             Toast.makeText(this, "Your cart is empty!", Toast.LENGTH_SHORT).show();

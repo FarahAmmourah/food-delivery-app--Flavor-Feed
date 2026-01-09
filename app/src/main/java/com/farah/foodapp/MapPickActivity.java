@@ -28,6 +28,7 @@ public class MapPickActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
+        // Request location permission at runtime
         if (checkSelfPermission(Manifest.permission.ACCESS_FINE_LOCATION)
                 != PackageManager.PERMISSION_GRANTED) {
             requestPermissions(new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, 1);
@@ -74,14 +75,18 @@ public class MapPickActivity extends AppCompatActivity {
                 webView.setVisibility(View.VISIBLE);
             }
 
+           // Receive selected location from WebView using custom URL scheme
             @Override
             public boolean shouldOverrideUrlLoading(WebView view, String url) {
                 if (url.startsWith("myapp://pick-location")) {
                     Uri uri = Uri.parse(url);
+
+                    // Extract selected location data from custom URL
                     double lat = Double.parseDouble(uri.getQueryParameter("lat"));
                     double lon = Double.parseDouble(uri.getQueryParameter("lng"));
                     String address = uri.getQueryParameter("address");
 
+                    // Send selected location back to CheckoutActivity
                     Intent result = new Intent();
                     result.putExtra("pickedLat", lat);
                     result.putExtra("pickedLon", lon);
@@ -98,6 +103,8 @@ public class MapPickActivity extends AppCompatActivity {
         String mapUrl = baseUrl + "/select-location/";
         webView.loadUrl(mapUrl);
     }
+
+    // Reload map after user grants location permission
 
     @Override
     public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
