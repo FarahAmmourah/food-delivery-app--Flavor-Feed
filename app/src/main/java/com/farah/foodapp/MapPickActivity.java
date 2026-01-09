@@ -36,6 +36,7 @@ public class MapPickActivity extends AppCompatActivity {
 
         FrameLayout rootLayout = new FrameLayout(this);
         webView = new WebView(this);
+        //LOADING
         progressBar = new ProgressBar(this, null, android.R.attr.progressBarStyleLarge);
 
         FrameLayout.LayoutParams progressParams = new FrameLayout.LayoutParams(
@@ -49,6 +50,7 @@ public class MapPickActivity extends AppCompatActivity {
         rootLayout.addView(progressBar);
         setContentView(rootLayout);
 
+      //connect views.MapView
         webView.getSettings().setJavaScriptEnabled(true);
         webView.getSettings().setDomStorageEnabled(true);
         webView.getSettings().setGeolocationEnabled(true);
