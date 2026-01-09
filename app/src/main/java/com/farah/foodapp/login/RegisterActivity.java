@@ -2,6 +2,7 @@ package com.farah.foodapp.login;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.RadioButton;
@@ -20,7 +21,7 @@ import java.util.Map;
 
 public class RegisterActivity extends AppCompatActivity {
 
-    private EditText etName, etEmail, etPassword, etConfirmPassword, etPhone;
+    private EditText etName, etEmail, etPassword, etConfirmPassword, etPhone,etRestaurantName;
     private Button btnRegister;
     private TextView tvAlreadyAccount;
     private RadioGroup rgRole;
@@ -35,6 +36,7 @@ public class RegisterActivity extends AppCompatActivity {
         setContentView(R.layout.activity_register);
 
         etName = findViewById(R.id.etName);
+        etRestaurantName = findViewById(R.id.etRestaurantName);
         etEmail = findViewById(R.id.etEmail);
         etPassword = findViewById(R.id.etPassword);
         etConfirmPassword = findViewById(R.id.etConfirmPassword);
@@ -48,6 +50,15 @@ public class RegisterActivity extends AppCompatActivity {
 
         auth = FirebaseAuth.getInstance();
         firestore = FirebaseFirestore.getInstance();
+
+        // Show / hide restaurant field based on role
+        rgRole.setOnCheckedChangeListener((group, checkedId) -> {
+            if (checkedId == R.id.rbAdmin) {
+                etRestaurantName.setVisibility(View.VISIBLE);
+            } else {
+                etRestaurantName.setVisibility(View.GONE);
+            }
+        });
 
         btnRegister.setOnClickListener(v -> registerUser());
 
@@ -70,6 +81,7 @@ public class RegisterActivity extends AppCompatActivity {
             return;
         }
 
+        // Password confirmation check
         if (!password.equals(confirmPassword)) {
             Toast.makeText(this, "Passwords do not match", Toast.LENGTH_SHORT).show();
             return;
@@ -77,6 +89,7 @@ public class RegisterActivity extends AppCompatActivity {
 
         String role = rbRestaurant.isChecked() ? "restaurant" : "customer";
 
+        // Create Firebase user account
         auth.createUserWithEmailAndPassword(email, password)
                 .addOnSuccessListener(authResult -> {
 
@@ -89,6 +102,7 @@ public class RegisterActivity extends AppCompatActivity {
                     userData.put("phone", phone);
                     userData.put("role", role);
 
+                    // Save user in "users" collection
                     firestore.collection("users")
                             .document(uid)
                             .set(userData)

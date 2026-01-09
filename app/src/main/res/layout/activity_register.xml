@@ -46,6 +46,17 @@
             android:layout_marginBottom="12dp"
             android:backgroundTint="@color/accent"
             android:textColor="@color/foreground"/>
+        <EditText
+            android:id="@+id/etRestaurantName"
+            android:hint="Restaurant name"
+            android:padding="12dp"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="12dp"
+            android:backgroundTint="@color/accent"
+            android:textColor="@color/foreground"
+            android:visibility="gone" />
+
 
         <EditText
             android:id="@+id/etPhone"

@@ -36,12 +36,13 @@ public class ForgotPasswordActivity extends AppCompatActivity {
 
     private void resetPassword() {
         String email = etEmail.getText().toString();
-
+        // Validate email input
         if (TextUtils.isEmpty(email)) {
             Toast.makeText(this, "Please enter your email", Toast.LENGTH_SHORT).show();
             return;
         }
 
+        // Firebase password reset process
         mAuth.sendPasswordResetEmail(email)
                 .addOnCompleteListener(task -> {
                     if (task.isSuccessful()) {

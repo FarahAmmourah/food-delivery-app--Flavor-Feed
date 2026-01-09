@@ -47,6 +47,7 @@ public class LoginActivity extends AppCompatActivity {
         tvForgot = findViewById(R.id.tvForgot);
         btnGoogle = findViewById(R.id.btnGoogle);
 
+        // Role selection
         rgRole = findViewById(R.id.rgRole);
         rbCustomer = findViewById(R.id.rbCustomer);
         rbRestaurant = findViewById(R.id.rbAdmin);
@@ -59,6 +60,7 @@ public class LoginActivity extends AppCompatActivity {
         tvForgot.setOnClickListener(v ->
                 startActivity(new Intent(this, ForgotPasswordActivity.class)));
 
+        // Customize Google Sign-In
         if (btnGoogle != null) {
             btnGoogle.setSize(SignInButton.SIZE_WIDE);
             for (int i = 0; i < btnGoogle.getChildCount(); i++) {
@@ -74,6 +76,8 @@ public class LoginActivity extends AppCompatActivity {
         }
     }
 
+
+    // user login and role validation
     private void loginUser() {
         String email = etEmail.getText().toString().trim();
         String password = etPassword.getText().toString().trim();
@@ -100,6 +104,7 @@ public class LoginActivity extends AppCompatActivity {
                     FirebaseUser user = auth.getCurrentUser();
                     if (user == null) return;
 
+                    // Fetch user role from Firestore
                     FirebaseFirestore.getInstance()
                             .collection("users")
                             .document(user.getUid())
@@ -114,6 +119,7 @@ public class LoginActivity extends AppCompatActivity {
 
                                 String role = doc.getString("role");
 
+                                // Validate selected role with stored role
                                 if (role != null && role.equals(selectedRole)) {
 
                                     Toast.makeText(this,
