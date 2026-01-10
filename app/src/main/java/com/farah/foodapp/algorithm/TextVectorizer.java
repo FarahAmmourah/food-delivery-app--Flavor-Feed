@@ -67,7 +67,7 @@ public class TextVectorizer {
     private static int addWords(String[] words, int startIdx) {
         for (String w : words) {
             if (!vocab.containsKey(w) && startIdx < VOCAB_SIZE) {/* check that
-     the word is not taken already no redandant and do no exceed limit 300*/
+     the word is not taken already no redandant in vec and do no exceed limit 300*/
                 vocab.put(w, startIdx++);// put the word in vocab of given indexand then raise counter by one
             }
         }
@@ -89,7 +89,7 @@ public class TextVectorizer {
         String[] words = text.split("\\s+");// turn the sentence into array of words
 
         for (String word : words) {
-            Integer index = vocab.get(word);
+            Integer index = vocab.get(word);//index of the given word
             if (index != null) {
                 vector[index] += 1f;// add one to the vector
             }

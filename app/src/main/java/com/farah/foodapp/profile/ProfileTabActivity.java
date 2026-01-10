@@ -35,10 +35,10 @@ public class ProfileTabActivity extends Fragment {
 
         //find and assign views by id
         tvTotalOrders = view.findViewById(R.id.tv_total_orders);
-        LinearLayout layoutSettings = view.findViewById(R.id.layout_settings);
-        LinearLayout layoutOrderHistory = view.findViewById(R.id.layout_order_history);
-        LinearLayout layoutFavorites = view.findViewById(R.id.layout_favorites);
-        LinearLayout layoutChatbot = view.findViewById(R.id.layout_chatbot);
+        LinearLayout layoutSettings = view.findViewById(R.id.layout_settings);//these are layouts but actlike button
+        LinearLayout layoutOrderHistory = view.findViewById(R.id.layout_order_history);//these are layouts but actlike button
+        LinearLayout layoutFavorites = view.findViewById(R.id.layout_favorites);//these are layouts but actlike button
+        LinearLayout layoutChatbot = view.findViewById(R.id.layout_chatbot);//these are layouts but actlike button
 
         layoutChatbot.setOnClickListener(v -> {
             Intent intent = new Intent(getActivity(), AIChatbotActivity.class);
@@ -63,7 +63,7 @@ public class ProfileTabActivity extends Fragment {
         String uid = Objects.requireNonNull(FirebaseAuth.getInstance().getCurrentUser()).getUid();
         FirebaseFirestore.getInstance()
                 .collection("orders")
-                .whereEqualTo("userId", uid)
+                .whereEqualTo("userId", uid)// bring the order that has a certain id
                 .get()
                 .addOnSuccessListener(query -> tvTotalOrders.setText(String.valueOf(query.size())))
                 .addOnFailureListener(e -> tvTotalOrders.setText("0"));

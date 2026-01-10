@@ -23,22 +23,27 @@ public class FavoritesAdapter extends RecyclerView.Adapter<FavoritesAdapter.FavV
     private List<ReelItem> favoriteList;
 
     public FavoritesAdapter(Context context, List<ReelItem> favoriteList) {
-        this.context = context;
+        this.context = context;// the fav activity
         this.favoriteList = favoriteList;
     }
 
     @NonNull
     @Override
+    // this will load the xml file of one reel inr the fav
     public FavViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         View view = LayoutInflater.from(context).inflate(R.layout.item_favorite_reel, parent, false);
         return new FavViewHolder(view);
     }
 
-    @Override
+    @Override// this fun is called by recycle view itself to fill the view with info based on the number of the video
     public void onBindViewHolder(@NonNull FavViewHolder holder, int position) {
         ReelItem reel = favoriteList.get(position);
+<<<<<<< Updated upstream
 
         //helps loading images
+=======
+// download vid using glide and display thumnail
+>>>>>>> Stashed changes
         Glide.with(context)
                 .load(reel.getVideoUrl())
                 .placeholder(R.drawable.ic_launcher_background)

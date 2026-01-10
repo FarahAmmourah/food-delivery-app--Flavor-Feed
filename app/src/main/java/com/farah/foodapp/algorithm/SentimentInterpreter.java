@@ -13,6 +13,7 @@ public class SentimentInterpreter {
     private static Interpreter interpreter = null; // still the model is no loaded
 
     private static MappedByteBuffer loadModel(Context context) throws IOException {
+        // open the file
         FileInputStream fis = new FileInputStream(context.getAssets().openFd("sentiment_model_v3.tflite").getFileDescriptor());
         FileChannel channel = fis.getChannel();
         long startOffset = context.getAssets().openFd("sentiment_model_v3.tflite").getStartOffset();

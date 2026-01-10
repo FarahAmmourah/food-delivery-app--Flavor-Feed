@@ -99,6 +99,7 @@
                     android:text="Rewards" />
 
             </com.google.android.material.tabs.TabLayout>
+            <!-- the pages is respon for displaying the content of each tab-->
 
             <androidx.viewpager2.widget.ViewPager2
                 android:id="@+id/viewPager"

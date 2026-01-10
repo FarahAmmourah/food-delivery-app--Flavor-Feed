@@ -25,6 +25,7 @@ public class ChangePasswordActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        // connect to xml
         setContentView(R.layout.activity_change_password);
 
         //init views
@@ -75,8 +76,9 @@ public class ChangePasswordActivity extends AppCompatActivity {
 
     }
 
+    //change pass fun
     private void changePassword() {
-        String oldPass = etOldPassword.getText().toString().trim();
+        String oldPass = etOldPassword.getText().toString().trim();// re,ove spaces from begin and end
         String newPass = etNewPassword.getText().toString().trim();
         String confirmPass = etConfirmPassword.getText().toString().trim();
 
@@ -94,6 +96,7 @@ public class ChangePasswordActivity extends AppCompatActivity {
         FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
         if (user == null) return;
 
+        //you cant change pass unless authenticate again
         AuthCredential credential = EmailAuthProvider.getCredential(user.getEmail(), oldPass);
 
         user.reauthenticate(credential).addOnCompleteListener(task -> {
@@ -106,7 +109,7 @@ public class ChangePasswordActivity extends AppCompatActivity {
                                 .update("password", newPass);
 
                         Toast.makeText(this, "Password Updated", Toast.LENGTH_SHORT).show();
-                        etOldPassword.setText("");
+                        etOldPassword.setText("");// reset views after update
                         etNewPassword.setText("");
                         etConfirmPassword.setText("");
                     } else {

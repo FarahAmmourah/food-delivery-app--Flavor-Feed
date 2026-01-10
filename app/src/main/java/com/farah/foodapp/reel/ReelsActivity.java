@@ -225,4 +225,8 @@ public class ReelsActivity extends AppCompatActivity {
             playOnlyCurrent(lastPosition);
         }, 250);
     }
+    public void notifyReelUpdated() {
+        reelsAdapter.notifyDataSetChanged();// redraw the reel again to download new info on screen
+    }
+
 }

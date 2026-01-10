@@ -254,8 +254,9 @@ public class FoodAdapter extends RecyclerView.Adapter<FoodAdapter.FoodViewHolder
         }
     };
 
-    public void setFoodListFull(List<FoodItem> list) {
-        foodListFull.clear();
+    public void setFoodListFull(List<FoodItem> list) {/*this fun is used to make
+    a copy of the meals into other list so no loose meals when filtering*/
+        foodListFull.clear();// in case call fun more than one time
         foodListFull.addAll(list);
     }
 

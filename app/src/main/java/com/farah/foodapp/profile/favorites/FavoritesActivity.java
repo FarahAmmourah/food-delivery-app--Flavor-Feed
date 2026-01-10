@@ -28,14 +28,22 @@ public class FavoritesActivity extends AppCompatActivity {
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_favorites);
+<<<<<<< Updated upstream
 
         //init the views
+=======
+// connect the java to xml
+>>>>>>> Stashed changes
         recyclerView = findViewById(R.id.recyclerFavorites);
+        //make it look like a grid 3 reels in one row
         recyclerView.setLayoutManager(new GridLayoutManager(this, 3));
+        // set adapter ro fill the recycl view with info
         favoritesAdapter = new FavoritesAdapter(this, favoriteList);
         recyclerView.setAdapter(favoritesAdapter);
 
+        // this layout is set to gone will show if there is no liked reels
         layoutEmpty = findViewById(R.id.layoutEmpty);
+
 
         ImageView btnBack = findViewById(R.id.btnBack);
         btnBack.setOnClickListener(v -> finish());
@@ -44,6 +52,7 @@ public class FavoritesActivity extends AppCompatActivity {
     }
 
     private void loadFavorites() {
+        // user id
         String uid = FirebaseAuth.getInstance().getCurrentUser().getUid();
         FirebaseFirestore db = FirebaseFirestore.getInstance();
 
@@ -51,25 +60,33 @@ public class FavoritesActivity extends AppCompatActivity {
                 .collection("favorites")
                 .get()
                 .addOnSuccessListener(querySnapshot -> {
+                    // reset list to fill it again with newest info
                     favoriteList.clear();
                     for (QueryDocumentSnapshot doc : querySnapshot) {
                         ReelItem reel = new ReelItem(
                                 doc.getString("videoUrl"),
                                 doc.getString("title"),
                                 doc.getString("restaurant"),
-                                0, 0, null,
+                                0, 0, null,// no need for real num of likes ot comment
                                 doc.getDouble("price"),
                                 doc.getString("restaurantId"),
                                 doc.getString("reelId"),
                                 doc.getString("imageUrl")
                         );
+                        //liked is set true so that when we open no need to check with fb if liked
                         reel.setLiked(true);
+                        // add reel to the list
                         favoriteList.add(reel);
                     }
 
+                    // so we add new data apater neeed to be called again
                     favoritesAdapter.notifyDataSetChanged();
+<<<<<<< Updated upstream
 
                     //handle empty
+=======
+// if no like reels so certain layout 
+>>>>>>> Stashed changes
                     if (favoriteList.isEmpty()) {
                         layoutEmpty.setVisibility(View.VISIBLE);
                         recyclerView.setVisibility(View.GONE);

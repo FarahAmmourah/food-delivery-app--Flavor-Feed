@@ -56,7 +56,7 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Favorite"
+                    android:text="Falvor Feed"
                     android:textSize="18sp"
                     android:textColor="@color/primary"
                     android:textStyle="bold" />
@@ -64,7 +64,7 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Mario's Pizzeria"
+                    android:text="Best Food Service"
                     android:textSize="16sp"
                     android:textColor="@color/foreground" />
             </LinearLayout>

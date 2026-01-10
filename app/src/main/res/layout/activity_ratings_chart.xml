@@ -43,12 +43,13 @@
                 android:layout_height="wrap_content"
                 android:orientation="vertical">
 
+                //use lib to know where to draw the chart
                 <com.github.mikephil.charting.charts.BarChart
                     android:id="@+id/barChart"
                     android:layout_width="1000dp"
                     android:layout_height="500dp"
-                    android:paddingBottom="40dp"
-                    android:background="#F8F8F8" />
+                    android:background="#F8F8F8"
+                    android:paddingBottom="40dp" />
             </LinearLayout>
         </HorizontalScrollView>
 

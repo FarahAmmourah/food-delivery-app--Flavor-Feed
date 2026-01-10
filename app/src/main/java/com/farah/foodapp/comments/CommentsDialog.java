@@ -34,6 +34,8 @@ public class CommentsDialog extends BottomSheetDialog {
 
     private CommentAdapter adapter;
     private ReelItem reel;
+    private ReelsActivity reelsActivity;
+
     private FirebaseFirestore db;
     private FirebaseAuth auth;
 // contex is the place that the comments dia will appear in
@@ -41,6 +43,8 @@ public class CommentsDialog extends BottomSheetDialog {
         super(context);
         this.comments = comments;
         this.reel = reel;
+        this.reelsActivity = reelsActivity;
+
     }
 
     @Override /* inflate / connect ui into java */
@@ -171,11 +175,17 @@ public class CommentsDialog extends BottomSheetDialog {
         adapter.notifyItemInserted(comments.size() - 1);// notify adapter to read new comment given position
         recycler.scrollToPosition(comments.size() - 1);// scroll to lastest comm
         etComment.setText("");// comment section rest
+        reel.setCommentsCount(comments.size()); // تحديث العدد محليًا
+
+        if (reelsActivity != null) {
+            reelsActivity.notifyReelUpdated(); // تحديث واجهة الريلز
+        }
 
         // store new com to db
         if (reel != null && reel.getReelId() != null) {
             db.collection("reels")
                     .document(reel.getReelId())
+
                     .update("comments", FieldValue.arrayUnion(formattedComment))
                     .addOnSuccessListener(a -> {
                         db.collection("reels")
