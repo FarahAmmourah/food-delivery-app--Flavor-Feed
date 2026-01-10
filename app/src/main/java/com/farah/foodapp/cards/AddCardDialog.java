@@ -58,7 +58,7 @@ public class AddCardDialog extends DialogFragment {
     }
 
     private void createPaymentIntentOnBackend() {
-        new Thread(() -> {
+        new Thread(() -> {// better than to open in UI thread for security
             try {
                 // Prepare JSON data to send to backend
                 JSONObject jsonBody = new JSONObject();

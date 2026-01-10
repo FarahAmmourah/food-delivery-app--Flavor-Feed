@@ -33,6 +33,7 @@ public class ProfileTabActivity extends Fragment {
 
         View view = inflater.inflate(R.layout.profile_tab, container, false);
 
+        //find and assign views by id
         tvTotalOrders = view.findViewById(R.id.tv_total_orders);
         LinearLayout layoutSettings = view.findViewById(R.id.layout_settings);
         LinearLayout layoutOrderHistory = view.findViewById(R.id.layout_order_history);

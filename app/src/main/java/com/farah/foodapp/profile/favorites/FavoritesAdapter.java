@@ -38,6 +38,7 @@ public class FavoritesAdapter extends RecyclerView.Adapter<FavoritesAdapter.FavV
     public void onBindViewHolder(@NonNull FavViewHolder holder, int position) {
         ReelItem reel = favoriteList.get(position);
 
+        //helps loading images
         Glide.with(context)
                 .load(reel.getVideoUrl())
                 .placeholder(R.drawable.ic_launcher_background)

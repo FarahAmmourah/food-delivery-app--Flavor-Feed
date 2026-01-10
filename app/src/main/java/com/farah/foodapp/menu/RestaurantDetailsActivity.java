@@ -39,6 +39,7 @@ public class RestaurantDetailsActivity extends AppCompatActivity {
         ImageButton btnBack = findViewById(R.id.btnBack);
         btnBack.setOnClickListener(v -> onBackPressed());
 
+        //find views
         tvRestaurantName = findViewById(R.id.tvRestaurantName);
         tvAddress = findViewById(R.id.tvAddress);
         recyclerViewMenu = findViewById(R.id.recyclerViewMenu);
@@ -49,8 +50,10 @@ public class RestaurantDetailsActivity extends AppCompatActivity {
 
         recyclerViewMenu.setAdapter(adapter);
 
+        //init db
         db = FirebaseFirestore.getInstance();
 
+        //get admin info
         String restaurantId = getIntent().getStringExtra("restaurantId");
         if (restaurantId != null) {
             loadRestaurantDetails(restaurantId);
@@ -143,6 +146,7 @@ public class RestaurantDetailsActivity extends AppCompatActivity {
                         Toast.makeText(this, "Error loading menu", Toast.LENGTH_SHORT).show());
     }
 
+    //update cart counter
     public void updateCartBadge() {
         int count = CartManager.getTotalQuantity();
         if (bottomNavigationView != null) {

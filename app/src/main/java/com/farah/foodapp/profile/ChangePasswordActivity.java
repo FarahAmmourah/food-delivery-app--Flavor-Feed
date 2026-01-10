@@ -27,6 +27,7 @@ public class ChangePasswordActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_change_password);
 
+        //init views
         etOldPassword = findViewById(R.id.et_old_password);
         etNewPassword = findViewById(R.id.et_new_password);
         etConfirmPassword = findViewById(R.id.et_confirm_password);
@@ -37,8 +38,10 @@ public class ChangePasswordActivity extends AppCompatActivity {
 
         btnBack.setOnClickListener(v -> finish());
 
+        //password btn
         btnChangePassword.setOnClickListener(v -> changePassword());
 
+        //language btn
         btnChangeLanguage.setOnClickListener(v -> {
             final String[] languages = {"English", "عربي"};
 
@@ -54,6 +57,7 @@ public class ChangePasswordActivity extends AppCompatActivity {
             builder.create().show();
         });
 
+        //logout btn
         btnLogout.setOnClickListener(v -> {
             new AlertDialog.Builder(this)
                     .setTitle("Logout")
@@ -86,6 +90,7 @@ public class ChangePasswordActivity extends AppCompatActivity {
             return;
         }
 
+        //if user guest
         FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
         if (user == null) return;
 

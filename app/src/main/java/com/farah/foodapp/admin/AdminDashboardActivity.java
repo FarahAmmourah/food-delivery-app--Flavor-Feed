@@ -26,7 +26,8 @@ public class AdminDashboardActivity extends AppCompatActivity {
 
     private TabLayout tabLayout;
     private ViewPager2 viewPager;
-    private ListenerRegistration notificationListener;
+    private ListenerRegistration orderListener;
+
 
     @SuppressLint("NonConstantResourceId")
     @Override
@@ -69,97 +70,69 @@ public class AdminDashboardActivity extends AppCompatActivity {
         }
 
         bottomNavigationView.setSelectedItemId(R.id.nav_dashboard);
+        listenForNewOrders();
     }
 
     @Override
     protected void onStart() {
         super.onStart();
-        startRestaurantNotificationListener();
+        listenForNewOrders();
     }
-
     @Override
     protected void onStop() {
         super.onStop();
-        if (notificationListener != null) {
-            notificationListener.remove();
-        }
+        if (orderListener != null) orderListener.remove();
     }
+    private void listenForNewOrders() {
+        String restaurantId = FirebaseAuth.getInstance().getCurrentUser().getUid();
 
-    private void startRestaurantNotificationListener() {
-        String uid = FirebaseAuth.getInstance().getCurrentUser().getUid();
-        FirebaseFirestore db = FirebaseFirestore.getInstance();
-
-        db.collection("restaurants")
-                .document(uid)
-                .get()
-                .addOnSuccessListener(doc -> {
-                    if (doc.exists()) {
-                        String restaurantName = doc.getString("name");
-                        if (restaurantName != null && !restaurantName.isEmpty()) {
-                            listenForNotifications(restaurantName);
-                        }
-                    }
-                })
-                .addOnFailureListener(e ->
-                        android.util.Log.e("AdminDashboard", "Error fetching restaurant name", e));
-    }
-
-    private void listenForNotifications(String restaurantName) {
-        notificationListener = FirebaseFirestore.getInstance()
-                .collection("notifications")
-                .whereEqualTo("restaurantName", restaurantName)
+        orderListener = FirebaseFirestore.getInstance()
+                .collection("orders")
+                .whereEqualTo("restaurantId", restaurantId)
                 .addSnapshotListener((snapshots, e) -> {
                     if (e != null || snapshots == null) return;
 
                     for (DocumentChange dc : snapshots.getDocumentChanges()) {
+
                         if (dc.getType() == DocumentChange.Type.ADDED) {
-                            String title = dc.getDocument().getString("title");
-                            String message = dc.getDocument().getString("message");
-                            String orderId = dc.getDocument().getString("orderId");
 
-                            if (orderId != null && !orderId.isEmpty()) {
-                                FirebaseFirestore.getInstance()
-                                        .collection("orders")
-                                        .document(orderId)
-                                        .get()
-                                        .addOnSuccessListener(orderDoc -> {
-                                            if (orderDoc.exists()) {
-                                                StringBuilder itemsText = new StringBuilder();
-                                                java.util.List<String> items = (java.util.List<String>) orderDoc.get("items");
-                                                Double total = orderDoc.getDouble("total");
+                            Boolean notified = dc.getDocument().getBoolean("notifiedRestaurant");
+                            if (notified != null && notified) return;
 
-                                                if (items != null && !items.isEmpty()) {
-                                                    for (String item : items) {
-                                                        itemsText.append("• ").append(item).append("\n");
-                                                    }
-                                                }
+                            showRestaurantNotification(
+                                    "New Order",
+                                    "You received a new order"
+                            );
 
-                                                String detailedMessage = message;
-                                                if (itemsText.length() > 0) {
-                                                    detailedMessage += "\n\nItems:\n" + itemsText;
-                                                }
-                                                if (total != null) {
-                                                    detailedMessage += "\nTotal: " + String.format("%.2f JOD", total);
-                                                }
-
-                                                showLocalNotification(title, detailedMessage);
-                                            } else {
-                                                showLocalNotification(title, message);
-                                            }
-                                        })
-                                        .addOnFailureListener(ex -> {
-                                            android.util.Log.e("AdminDashboard", "Error loading order details", ex);
-                                            showLocalNotification(title, message);
-                                        });
-                            } else {
-                                showLocalNotification(title, message);
-                            }
+                            dc.getDocument().getReference()
+                                    .update("notifiedRestaurant", true);
                         }
                     }
                 });
     }
+    private void showRestaurantNotification(String title, String message) {
+        String channelId = "restaurant_channel";
 
+        NotificationManager manager =
+                (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
 
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            NotificationChannel channel = new NotificationChannel(
+                    channelId,
+                    "Restaurant Notifications",
+                    NotificationManager.IMPORTANCE_HIGH
+            );
+            manager.createNotificationChannel(channel);
+        }
+
+        NotificationCompat.Builder builder = new NotificationCompat.Builder(this, channelId)
+                .setSmallIcon(R.drawable.logo_app)
+                .setContentTitle(title)
+                .setContentText(message)
+                .setAutoCancel(true);
+
+        manager.notify((int) System.currentTimeMillis(), builder.build());
+    }
     private void showLocalNotification(String title, String message) {
         String channelId = "restaurant_channel";
         NotificationManager manager =

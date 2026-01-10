@@ -21,11 +21,6 @@ import com.google.firebase.auth.FirebaseAuth;
 import java.util.List;
 
 public class AIChatbotActivity extends AppCompatActivity {
-    // Request code for automatic order
-    // (can be any uncommon code)
-    private static final int REQUEST_AUTO_ORDER = 1001;
-
-
     private RecyclerView recyclerViewChat;
     private EditText editTextMessage;
     private ChatAdapter chatAdapter;
@@ -128,7 +123,6 @@ public class AIChatbotActivity extends AppCompatActivity {
                 runOnUiThread(() -> {
                     stopTypingAnimation();
                     addBotMessage(response);// show AI response
-                    checkForOrderCommand(response);
                 });
             }
 
@@ -170,50 +164,6 @@ public class AIChatbotActivity extends AppCompatActivity {
         recyclerViewChat.scrollToPosition(messages.size() - 1);
 
         ChatStorage.saveMessages(this, messages);
-    }
-
-    // Check if AI response contains "place order" commands
-    private void checkForOrderCommand(String aiResponse) {
-        String msg = aiResponse.toLowerCase();
-
-        if (
-                msg.contains("place my order") ||
-                        msg.contains("order now")
-        ) {
-            runOnUiThread(() -> {
-                if (CartManager.getCartItems().isEmpty()) {
-                    addBotMessage("Your Cart is Empty!");
-                } else {
-                    addBotMessage("Processing your order...");
-                    placeOrderWithChat();
-                }
-            });
-        }
-    }
-
-    // Open CheckoutActivity to place order automatically
-    private void placeOrderWithChat() {
-        if (CartManager.getCartItems().isEmpty()) {
-            addBotMessage("Your Cart is Empty!");
-            return;
-        }
-
-        Intent intent = new Intent(this, CheckoutActivity.class);
-        intent.putExtra("autoPlaceOrder", true);
-        startActivityForResult(intent, REQUEST_AUTO_ORDER);
-    }
-
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-        if (requestCode == REQUEST_AUTO_ORDER && resultCode == RESULT_OK && data != null) {
-            boolean placed = data.getBooleanExtra("orderPlaced", false);
-            if (placed) {
-                addBotMessage("Your order has been placed successfully!");
-            } else {
-                addBotMessage("Failed to place your order.");
-            }
-        }
     }
 
     private void startTypingAnimation() {

@@ -238,6 +238,9 @@ public class CheckoutActivity extends AppCompatActivity {
         orderData.put("items", itemsList);
         orderData.put("eta", "30-40 min");
 
+        orderData.put("notifiedRestaurant", false);
+        orderData.put("notifiedCustomer", false);
+
         FirebaseFirestore db = FirebaseFirestore.getInstance();
         db.collection("orders")
                 .add(orderData)

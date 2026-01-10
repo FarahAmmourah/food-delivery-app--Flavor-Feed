@@ -29,6 +29,7 @@ public class FavoritesActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_favorites);
 
+        //init the views
         recyclerView = findViewById(R.id.recyclerFavorites);
         recyclerView.setLayoutManager(new GridLayoutManager(this, 3));
         favoritesAdapter = new FavoritesAdapter(this, favoriteList);
@@ -68,6 +69,7 @@ public class FavoritesActivity extends AppCompatActivity {
 
                     favoritesAdapter.notifyDataSetChanged();
 
+                    //handle empty
                     if (favoriteList.isEmpty()) {
                         layoutEmpty.setVisibility(View.VISIBLE);
                         recyclerView.setVisibility(View.GONE);

@@ -32,17 +32,21 @@ public class RatingsChartActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_ratings_chart);
 
+        // find views
         ImageButton backBtn = findViewById(R.id.btnBack);
-        backBtn.setOnClickListener(v -> onBackPressed());
 
         barChart = findViewById(R.id.barChart);
         pieChart = findViewById(R.id.pieChart);
         db = FirebaseFirestore.getInstance();
 
+        //find admin id
         String restaurantId = getIntent().getStringExtra("restaurantId");
         if (restaurantId != null) {
             loadRatingsData(restaurantId);
         }
+        //back btn click listener
+        backBtn.setOnClickListener(v -> onBackPressed());
+
     }
 
     private void loadRatingsData(String restaurantId) {
@@ -55,16 +59,18 @@ public class RatingsChartActivity extends AppCompatActivity {
                     ArrayList<String> labels = new ArrayList<>();
 
                     int index = 0;
+                    //loop through each meal
                     for (DocumentSnapshot doc : queryDocumentSnapshots) {
                         Double ratingObj = doc.getDouble("rating");
                         String name = doc.getString("name");
-
+                        // Get rating and meal name from Firestore
                         if (ratingObj != null && name != null) {
                             float rating = ratingObj.floatValue();
+                            // Add entry to bar chart (x = index, y = rating)
                             barEntries.add(new BarEntry(index, rating));
                             pieEntries.add(new PieEntry(rating, formatLabel(name)));
                             labels.add(formatLabel(name));
-                            index++;
+                            index++; // move to next x-axis position
                         }
                     }
 
@@ -75,24 +81,26 @@ public class RatingsChartActivity extends AppCompatActivity {
                             Color.parseColor("#E53935")
                     };
 
-                    // BAR CHART
+                    // Create dataset for bar chart
                     BarDataSet dataSet = new BarDataSet(barEntries, "Meal Ratings");
                     List<Integer> colorList = new ArrayList<>();
                     for (int i = 0; i < labels.size(); i++) {
                         colorList.add(reds[i % reds.length]);
                     }
+                    //Assign colors to bars
                     dataSet.setColors(colorList);
                     dataSet.setValueTextColor(Color.BLACK);
                     dataSet.setValueTextSize(13f);
 
                     BarData barData = new BarData(dataSet);
-                    barData.setBarWidth(0.4f);
+                    barData.setBarWidth(0.4f);// width of each bar
                     barChart.setData(barData);
 
+                    // Configure X-axis (meal names)
                     XAxis xAxis = barChart.getXAxis();
-                    xAxis.setValueFormatter(new IndexAxisValueFormatter(labels));
+                    xAxis.setValueFormatter(new IndexAxisValueFormatter(labels));// show meal names
                     xAxis.setPosition(XAxis.XAxisPosition.BOTTOM);
-                    xAxis.setGranularity(1f);
+                    xAxis.setGranularity(1f);// one label per bar
                     xAxis.setDrawGridLines(false);
                     xAxis.setTextSize(11f);
                     xAxis.setTextColor(Color.BLACK);
@@ -100,33 +108,39 @@ public class RatingsChartActivity extends AppCompatActivity {
                     xAxis.setLabelCount(labels.size());
                     xAxis.setYOffset(40f);
                     xAxis.setAvoidFirstLastClipping(true);
+                    // Add extra space for labels
                     barChart.setExtraBottomOffset(110f);
 
+                    //Description of bar chart
                     Description barDesc = new Description();
                     barDesc.setText("Meal Ratings Overview");
                     barChart.setDescription(barDesc);
+
+                    // Configure Y-axis (rating scale)
                     barChart.getAxisLeft().setAxisMinimum(0f);
-                    barChart.getAxisLeft().setAxisMaximum(5f);
-                    barChart.getAxisRight().setEnabled(false);
+                    barChart.getAxisLeft().setAxisMaximum(5f);//ratings from 0 to 5
+                    barChart.getAxisRight().setEnabled(false); // disable right axis
                     barChart.getLegend().setEnabled(false);
                     barChart.animateY(1200);
                     barChart.invalidate();
 
-                    // PIE CHART
+                    // Create dataset for pie chart
                     PieDataSet pieDataSet = new PieDataSet(pieEntries, "");
                     pieDataSet.setColors(colorList);
                     pieDataSet.setValueTextSize(12f);
                     pieDataSet.setValueTextColor(Color.WHITE);
+
+                    // Wrap dataset inside PieData
                     PieData pieData = new PieData(pieDataSet);
 
                     pieChart.setData(pieData);
-                    pieChart.setUsePercentValues(false);
+                    pieChart.setUsePercentValues(false);// show raw values, not percentages
                     pieChart.getDescription().setEnabled(false);
                     pieChart.setCenterText("Ratings %");
                     pieChart.setCenterTextSize(14f);
                     pieChart.setHoleRadius(35f);
                     pieChart.animateY(1500);
-                    pieChart.invalidate();
+                    pieChart.invalidate();// refresh chart
                 });
     }
 
