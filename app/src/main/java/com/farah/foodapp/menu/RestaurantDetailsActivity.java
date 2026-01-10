@@ -24,8 +24,8 @@ import java.util.ArrayList;
 
 public class RestaurantDetailsActivity extends AppCompatActivity {
 
-    private TextView tvRestaurantName, tvAddress;// from xml
-    private RecyclerView recyclerViewMenu;// from xml
+    private TextView tvRestaurantName, tvAddress; // from xml
+    private RecyclerView recyclerViewMenu;        // from xml
     private FoodAdapter adapter;
     private ArrayList<FoodItem> menuList;
     private FirebaseFirestore db;
@@ -36,59 +36,51 @@ public class RestaurantDetailsActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_restaurant_details);
 
-        // the back btt onclick
+        // the back btn onclick
         ImageButton btnBack = findViewById(R.id.btnBack);
         btnBack.setOnClickListener(v -> {
             getOnBackPressedDispatcher().onBackPressed();
         });
 
-<<<<<<< Updated upstream
-        //find views
-=======
-// connect xml labels with java
->>>>>>> Stashed changes
+        // find views / connect xml labels with java
         tvRestaurantName = findViewById(R.id.tvRestaurantName);
         tvAddress = findViewById(R.id.tvAddress);
         recyclerViewMenu = findViewById(R.id.recyclerViewMenu);
 
-        // recycle takes linear so it displays the items in the list verticaly
+        // recycler takes linear so it displays the items in the list vertically
         recyclerViewMenu.setLayoutManager(new LinearLayoutManager(this));
+
         menuList = new ArrayList<>();
         adapter = new FoodAdapter(this, menuList, true);
 
-        // conects recycle view with adapter so it can find the data
-        //that it wants to display, adap creates item food and fills its data
+        // connects recycler view with adapter so it can find the data
+        // that it wants to display, adapter creates item food and fills its data
         recyclerViewMenu.setAdapter(adapter);
 
-<<<<<<< Updated upstream
-        //init db
+        // init db / now download data from firestore
         db = FirebaseFirestore.getInstance();
 
-        //get admin info
-=======
-
-        // now download data from store
-        db = FirebaseFirestore.getInstance();
-
-        // we opened page using id so < check which one it is from db
->>>>>>> Stashed changes
+        // we opened page using id so check which restaurant it is from db
         String restaurantId = getIntent().getStringExtra("restaurantId");
         if (restaurantId != null) {
-            // go to fun and down data
-            loadRestaurantDetails(restaurantId);//  brings name and address
-            loadMenuItems(restaurantId);// load each meal and puts it in food item
+
+            // go to functions and download data
+            loadRestaurantDetails(restaurantId); // brings name and address
+            loadMenuItems(restaurantId);         // load each meal and put it in food item
 
             // opens rating page
             Button btnShowChart = findViewById(R.id.btnShowChart);
             btnShowChart.setOnClickListener(v -> {
                 Intent intent = new Intent(this, RatingsChartActivity.class);
-                intent.putExtra("restaurantId", restaurantId);// give extra info that this is for specific restu
+                intent.putExtra("restaurantId", restaurantId); // specific restaurant
                 startActivity(intent);
             });
+
         } else {
             Toast.makeText(this, "No restaurant found!", Toast.LENGTH_SHORT).show();
         }
 
+        // bottom navigation setup
         bottomNavigationView = findViewById(R.id.bottomNavigationView);
         bottomNavigationView.setBackgroundColor(getResources().getColor(R.color.primary));
         bottomNavigationView.setItemIconTintList(getResources().getColorStateList(R.color.primaryForeground));
@@ -115,7 +107,7 @@ public class RestaurantDetailsActivity extends AppCompatActivity {
             return false;
         });
 
-        updateCartBadge();// keep cart uptodate when open the activity
+        updateCartBadge(); // keep cart up to date when opening the activity
     }
 
     private void loadRestaurantDetails(String restaurantId) {
@@ -123,9 +115,9 @@ public class RestaurantDetailsActivity extends AppCompatActivity {
                 .get()
                 .addOnSuccessListener(documentSnapshot -> {
                     if (documentSnapshot.exists()) {
-                        String name = documentSnapshot.getString("name");// rest name
-                        String address = documentSnapshot.getString("address");// address
-                        tvRestaurantName.setText(name);// conect them to xml
+                        String name = documentSnapshot.getString("name");     // restaurant name
+                        String address = documentSnapshot.getString("address"); // address
+                        tvRestaurantName.setText(name); // connect them to xml
                         tvAddress.setText(address);
                     }
                 });
@@ -136,46 +128,55 @@ public class RestaurantDetailsActivity extends AppCompatActivity {
                 .collection("menu")
                 .get()
                 .addOnSuccessListener(queryDocumentSnapshots -> {
-                    menuList.clear();// make sure list clear to down data again
+
+                    // make sure list is clear to download data again
+                    menuList.clear();
+
                     for (QueryDocumentSnapshot doc : queryDocumentSnapshots) {
-                        String name = doc.getString("name");// meal name
+                        String name = doc.getString("name"); // meal name
                         String description = doc.getString("description");
                         String imageUrl = doc.getString("imageUrl");
-                        double smallPrice = doc.getDouble("smallPrice") != null ? doc.getDouble("smallPrice") : 0.0;
-                        double largePrice = doc.getDouble("largePrice") != null ? doc.getDouble("largePrice") : 0.0;
-                        float rating = doc.getDouble("rating") != null ? doc.getDouble("rating").floatValue() : 0f;
 
+                        double smallPrice = doc.getDouble("smallPrice") != null
+                                ? doc.getDouble("smallPrice") : 0.0;
 
-                        // make new obj from class food item to put meal
+                        double largePrice = doc.getDouble("largePrice") != null
+                                ? doc.getDouble("largePrice") : 0.0;
+
+                        float rating = doc.getDouble("rating") != null
+                                ? doc.getDouble("rating").floatValue() : 0f;
+
+                        // make new object from FoodItem class
                         FoodItem item = new FoodItem(
                                 name != null ? name : "",
                                 description != null ? description : "",
                                 imageUrl != null ? imageUrl : "",
                                 rating,
-                                "",// no need we are in the rest it self only used in search
+                                "", // no need, we are inside restaurant page
                                 smallPrice,
                                 largePrice
                         );
 
-                        item.setId(doc.getId());// id of the meal is set in food item used in rate
+                        // set ids for rating and linking
+                        item.setId(doc.getId());
                         item.setRestaurantId(restaurantId);
 
                         menuList.add(item);
                     }
-                    adapter.notifyDataSetChanged();// refresh adapter to notice that data change and refill
+
+                    // refresh adapter to refill data
+                    adapter.notifyDataSetChanged();
                 })
                 .addOnFailureListener(e ->
-                        Toast.makeText(this, "Error loading menu", Toast.LENGTH_SHORT).show());
+                        Toast.makeText(this, "Error loading menu", Toast.LENGTH_SHORT).show()
+                );
     }
 
-<<<<<<< Updated upstream
-    //update cart counter
-=======
-    // update small num on the bottomnav
->>>>>>> Stashed changes
+    // update cart counter / update small num on the bottom nav
     public void updateCartBadge() {
-        int count = CartManager.getTotalQuantity();// brings the number of orders in the cart
-        if (bottomNavigationView != null) {// protect from crash if the nav not found dont do anything
+        int count = CartManager.getTotalQuantity(); // number of orders in cart
+
+        if (bottomNavigationView != null) { // protect from crash
             if (count > 0) {
                 bottomNavigationView.getOrCreateBadge(R.id.nav_cart).setNumber(count);
             } else {

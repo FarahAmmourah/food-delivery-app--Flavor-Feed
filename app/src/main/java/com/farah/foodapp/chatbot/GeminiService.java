@@ -12,7 +12,7 @@ import java.util.concurrent.Executors;
 
 public class GeminiService {
     // API key for Google Gemini AI
-    private static final String API_KEY = "AIzaSyAWcsNPA9Qp24-8B5mN8PCsr5HD_cNSuts";
+    private static final String API_KEY = "AIzaSyBHp5funWWqbJct3XoPY7UcDPMsgHGhUeQ";
 
     // This variable represents the Gemini AI model and works asynchronously (Async)
     // This means when we send a message to the AI, the app doesn’t freeze

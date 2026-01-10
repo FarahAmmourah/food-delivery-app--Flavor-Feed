@@ -28,24 +28,19 @@ public class ProfileActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_profile);
-<<<<<<< Updated upstream
 
-        //init views
-=======
-// connect to xml
->>>>>>> Stashed changes
+        // init views / connect to xml
         tvAvatar = findViewById(R.id.tv_avatar);
         tvUsername = findViewById(R.id.tv_username);
         tvEmail = findViewById(R.id.tv_email);
         tvPhone = findViewById(R.id.tv_phone);
 
-        setupBottomNav();// this is to make the nav bar work
-        setupTabs();// define which page to open when you choose a tab
-        loadUserProfile();// brings user info and fill the views
+        setupBottomNav(); // make the bottom nav work
+        setupTabs();      // define which page opens for each tab
+        loadUserProfile();// download user info and fill the views
     }
 
-
-    //checks what nav is cliced and open the other page
+    // checks which nav item is clicked and opens the related page
     private void setupBottomNav() {
         BottomNavigationView bottomNavigationView = findViewById(R.id.bottomNavigationView);
         bottomNavigationView.setSelectedItemId(R.id.nav_profile);
@@ -70,32 +65,34 @@ public class ProfileActivity extends AppCompatActivity {
     }
 
     private void setupTabs() {
-        TabLayout tabLayout = findViewById(R.id.tabLayout);// profile and reward tab in the profile activity
-        ViewPager2 viewPager = findViewById(R.id.viewPager);// the space where the conent will be presented in the activity
+        // profile and rewards tabs inside ProfileActivity
+        TabLayout tabLayout = findViewById(R.id.tabLayout);
+        ViewPager2 viewPager = findViewById(R.id.viewPager);
 
-        ProfilePagerAdapter adapter = new ProfilePagerAdapter(this);// create adapter
-        viewPager.setAdapter(adapter);// give pager adapter to know what to show
+        // adapter decides which fragment to show
+        ProfilePagerAdapter adapter = new ProfilePagerAdapter(this);
+        viewPager.setAdapter(adapter);
 
+        // link TabLayout with ViewPager
         new TabLayoutMediator(tabLayout, viewPager, (tab, position) -> {
             switch (position) {
-                case 0:// position 0 is profile
+                case 0: // position 0 is profile
                     tab.setText("Profile");
                     break;
-                case 1:// position 1 is rewards
+                case 1: // position 1 is rewards
                     tab.setText("Rewards");
                     break;
             }
-        }).attach();//Start listening and linking TabLayout with ViewPager
+        }).attach();
     }
 
-<<<<<<< Updated upstream
-    //set up profile info
-=======
-
-    //this is used to down user info and connect it with views
->>>>>>> Stashed changes
+    // set up profile info
+    // this downloads user info from firestore and connects it with views
     private void loadUserProfile() {
-        String uid = Objects.requireNonNull(FirebaseAuth.getInstance().getCurrentUser()).getUid();
+        String uid = Objects.requireNonNull(
+                FirebaseAuth.getInstance().getCurrentUser()
+        ).getUid();
+
         FirebaseFirestore db = FirebaseFirestore.getInstance();
 
         db.collection("users").document(uid).get()
@@ -110,7 +107,10 @@ public class ProfileActivity extends AppCompatActivity {
                         tvPhone.setText(phone != null ? phone : "");
 
                         if (name != null && !name.isEmpty()) {
-                            tvAvatar.setText(String.valueOf(name.charAt(0)).toUpperCase());// the pofile icon is set to be the first letter of the name
+                            // avatar shows first letter of user name
+                            tvAvatar.setText(
+                                    String.valueOf(name.charAt(0)).toUpperCase()
+                            );
                         }
                     }
                 });
